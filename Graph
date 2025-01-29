@@ -1,0 +1,54 @@
+import matplotlib.pyplot as plt
+import networkx as nx
+
+# Initialize a directed graph
+G = nx.DiGraph()
+
+# Define nodes
+nodes = [
+    "Traffic Cameras",
+    "IoT Sensors",
+    "Navigation Apps",
+    "AI Processing Center",
+    "Dynamic Traffic Signals",
+    "Alternate Route Suggestions",
+]
+
+# Add nodes to the graph
+for node in nodes:
+    G.add_node(node)
+
+# Define edges (workflow connections)
+edges = [
+    ("Traffic Cameras", "AI Processing Center"),
+    ("IoT Sensors", "AI Processing Center"),
+    ("Navigation Apps", "AI Processing Center"),
+    ("AI Processing Center", "Dynamic Traffic Signals"),
+    ("AI Processing Center", "Alternate Route Suggestions"),
+]
+
+# Add edges to the graph
+G.add_edges_from(edges)
+
+# Define node positions
+pos = {
+    "Traffic Cameras": (0, 2),
+    "IoT Sensors": (0, 1),
+    "Navigation Apps": (0, 0),
+    "AI Processing Center": (1.5, 1),
+    "Dynamic Traffic Signals": (4, 2),
+    "Alternate Route Suggestions": (2, 0),
+}
+
+# Draw the graph
+plt.figure(figsize=(10, 6))
+nx.draw_networkx_nodes(G, pos, node_size=2000, node_color="skyblue")
+nx.draw_networkx_edges(G, pos, arrowstyle="->", arrowsize=20, edge_color="black")
+nx.draw_networkx_labels(G, pos, font_size=10, font_color="black", font_weight="bold")
+
+# Add title
+plt.title("Dynamic Traffic Management System Workflow", fontsize=15, fontweight="bold")
+
+# Show plot
+plt.axis("on")
+plt.show()
