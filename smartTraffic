@@ -1,0 +1,119 @@
+import numpy as np
+from sklearn.linear_model import LinearRegression
+import networkx as nx
+import matplotlib.pyplot as plt
+
+# Step 1: Simulated Traffic Data
+def generate_traffic_data():
+    """
+    Simulates traffic data with traffic flow (vehicles per minute) and signal timings.
+    Returns historical and real-time traffic data.
+    """
+    # Historical data: [Traffic Flow (vehicles/min), Signal Duration (seconds)]
+    historical_data = np.array([
+        [100, 30], [150, 40], [200, 50], [250, 60], [300, 70]
+    ])
+    # Real-time data: Traffic flow observations
+    real_time_data = np.array([120, 170, 210, 260, 320])
+    return historical_data, real_time_data
+
+# Step 2: Train a Model to Predict Signal Durations
+def train_model(historical_data):
+    """
+    Trains a linear regression model to predict signal duration based on traffic flow.
+    """
+    X = historical_data[:, 0].reshape(-1, 1)  # Traffic Flow
+    y = historical_data[:, 1]  # Signal Duration
+    model = LinearRegression().fit(X, y)
+    return model
+
+# Step 3: Dynamic Signal Adjustment
+def predict_signal_durations(model, real_time_data):
+    """
+    Predicts optimal signal durations based on real-time traffic data.
+    """
+    real_time_data = real_time_data.reshape(-1, 1)
+    predicted_durations = model.predict(real_time_data)
+    return np.round(predicted_durations, 2)
+
+# Step 4: Visualize Traffic Data and Predictions
+def plot_traffic_data(historical_data, real_time_data, predicted_durations):
+    """
+    Plots historical traffic data and real-time predictions.
+    """
+    # Historical Data
+    plt.figure(figsize=(10, 5))
+    plt.scatter(historical_data[:, 0], historical_data[:, 1], color='blue', label='Historical Data')
+    
+    # Real-Time Predictions
+    plt.scatter(real_time_data, predicted_durations, color='red', label='Predicted Durations')
+
+    # Regression Line
+    X = historical_data[:, 0].reshape(-1, 1)
+    y = historical_data[:, 1]
+    model = LinearRegression().fit(X, y)
+    x_line = np.linspace(min(historical_data[:, 0]), max(historical_data[:, 0]), 100).reshape(-1, 1)
+    y_line = model.predict(x_line)
+    plt.plot(x_line, y_line, color='green', linestyle='--', label='Regression Line')
+
+    plt.title("Traffic Flow vs Signal Duration")
+    plt.xlabel("Traffic Flow (vehicles/min)")
+    plt.ylabel("Signal Duration (seconds)")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+# Step 5: Alternate Route Suggestion and Visualization
+def suggest_alternate_routes_and_plot():
+    """
+    Creates a simulated road network and suggests alternate routes using shortest path algorithms.
+    Also plots the road network.
+    """
+    # Create a directed graph representing a road network
+    G = nx.DiGraph()
+    G.add_weighted_edges_from([
+        ("A", "B", 5), ("B", "C", 10), ("A", "C", 15), ("B", "D", 20),
+        ("C", "D", 5), ("A", "D", 50)
+    ])
+    
+    # Compute the shortest path from source to destination
+    source = "A"
+    destination = "D"
+    shortest_path = nx.shortest_path(G, source=source, target=destination, weight="weight")
+    print("Recommended Alternate Route:", " -> ".join(shortest_path))
+    
+    # Plot the road network
+    plt.figure(figsize=(8, 6))
+    pos = nx.spring_layout(G)  # Positioning the nodes for better visualization
+    nx.draw(G, pos, with_labels=True, node_size=3000, node_color="lightblue", font_size=10, font_weight="bold")
+    edge_labels = nx.get_edge_attributes(G, "weight")
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=10)
+
+    # Highlight the shortest path
+    path_edges = list(zip(shortest_path, shortest_path[1:]))
+    nx.draw_networkx_edges(G, pos, edgelist=path_edges, edge_color="red", width=2)
+    
+    plt.title("Road Network and Alternate Route")
+    plt.show()
+
+# Step 6: Main Function
+def main():
+    # Generate traffic data
+    historical_data, real_time_data = generate_traffic_data()
+
+    # Train the prediction model
+    model = train_model(historical_data)
+
+    # Predict signal durations for real-time data
+    predicted_durations = predict_signal_durations(model, real_time_data)
+    print("Real-Time Traffic Flow (vehicles/min):", real_time_data)
+    print("Predicted Signal Durations (seconds):", predicted_durations)
+
+    # Visualize traffic data and predictions
+    plot_traffic_data(historical_data, real_time_data, predicted_durations)
+
+    # Suggest alternate routes and plot the road network
+    suggest_alternate_routes_and_plot()
+
+# Run the main function
+main()
